@@ -1,0 +1,16 @@
+#!/bin/bash
+while read OLDSHA NEWSHA REF ; do
+	if [[ "$NEWSHA" != "0000000000000000000000000000000000000000" ]]; then
+		IFS='/' read -ra SPEC <<< "$REF"
+		if [[ ${SPEC[1]} == "heads" ]]; then
+			if [[ $REF == */feature/* ]] ; then
+				URL="http://nyapopsutil04:8080/job/bidw_dev/buildWithParameters?SHA=$NEWSHA&Ref=$REF"
+				curl -X POST $URL --user SVC_JenkinsInt:J3nkins!nt
+			fi
+			if [[ $REF == */release/* || $REF == */hotfix/* ]]; then
+				URL="http://nyapopsutil04:8080/job/bidw_qa/buildWithParameters?SHA=$NEWSHA&Ref=$REF"
+				curl -X POST $URL --user SVC_JenkinsInt:J3nkins!nt
+			fi
+		fi
+    fi
+done
